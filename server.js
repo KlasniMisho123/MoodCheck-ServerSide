@@ -12,7 +12,7 @@ const corsOptions = {
     origin: 'http://localhost:3000',
     optionsSuccessStatus: 200
 };
-
+//
 // Apply CORS middleware
 app.use(cors(corsOptions));
 app.use(bodyParser.json()); 
@@ -25,7 +25,7 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
       user: process.env.USER,
-      pass: process.env.PASSWORD,
+      pass: process.env.APP_PASSWORD,
     },
   });
 
@@ -69,23 +69,6 @@ app.post("/sendemail", async (req, res) => {
 
 
 sendMail(transporter, mailOptions);
-
-// nodemailer
-
-// try {
-//     const info = await transporter.sendMail({
-//         from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>',
-//         to: "kirisame404@gmail.com, ohokey.25@gmail.com",
-//         subject: "Hello ✔",
-//         text: "Hello world?",
-//         html: "<b>Hello world?</b>",
-//     });
-//     console.log("Message sent: %s", info.messageId);
-    
-// } catch(err) {
-//     console.log("nodemailer error: ", err.message)
-// }
-
 
 app.listen(port, () => {
     console.log(`App is Running on: http://localhost:${port}`);
