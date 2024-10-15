@@ -29,25 +29,6 @@ const transporter = nodemailer.createTransport({
     },
   });
 
-  const mailOptions = await transporter.sendMail({
-    from: {
-        name: "MoodCheck User",
-        address: process.env.USER
-    },
-    to: ["kirisame404@gmail.com"],
-    subject: "Sending MoodCheck Feedback ✔",
-    text: "Hello world?",
-    html: "<b>Hello world?</b>",
-});
-
-async function sendMail(transporter, mailOptions) {
-    try {
-        await transporter.sendMail(mailOptions)
-        console.log("Email has been sent succesfully!")
-    } catch(err) {
-        console.error('sendMail Error: ',err)
-    }
-}
 
 app.get("/", async (req, res) => {
     console.log("Connected to Server");
@@ -55,12 +36,37 @@ app.get("/", async (req, res) => {
     
 });
 
+app.get("/test", async (req, res) => { 
+    try {
+        const mailOptions = await transporter.sendMail({
+            from: {
+                name: "MoodCheck User",
+                address: process.env.USER
+            },
+            to: ["kirisame404@gmail.com"],
+            subject: "Sending MoodCheck Feedback ✔",
+            text: "Hello world?",
+            html: "<b>Hello world?</b>",
+        });
+
+        async function sendMail(transporter, mailOptions) {
+            try {
+                await transporter.sendMail(mailOptions)
+                console.log("Email has been sent succesfully!")
+            } catch(err) {
+                console.error('sendMail Error: ',err)
+            }
+        }
+        sendMail(transporter, mailOptions);
+    } catch(err) {
+        console.log("ERR: ",err)
+    }
+})
+
 
 app.post("/sendemail", async (req, res) => {
-    try {
         const { contactName, contactEmail, contactSubject, contactText } = req.body; 
-        // console.log("Received data:", { contactName, contactEmail, contactSubject, contactText });
-
+    try {
         res.json({ message: "Email has been sent successfully!" });
     } catch(err) {
         console.log(err.message)
@@ -68,7 +74,6 @@ app.post("/sendemail", async (req, res) => {
 });
 
 
-sendMail(transporter, mailOptions);
 
 app.listen(port, () => {
     console.log(`App is Running on: http://localhost:${port}`);
