@@ -29,6 +29,14 @@ const transporter = nodemailer.createTransport({
     },
   });
 
+async function sendMail(transporter, mailOptions) {
+    try {
+        await transporter.sendMail(mailOptions)
+        console.log("Email has been sent succesfully!")
+    } catch(err) {
+        console.error('sendMail Error: ',err)
+    }
+}
 
 app.get("/", async (req, res) => {
     console.log("Connected to Server");
@@ -36,40 +44,29 @@ app.get("/", async (req, res) => {
     
 });
 
-app.get("/test", async (req, res) => { 
+app.post("/sendemail", async (req, res) => {
+    const { contactName, contactEmail, contactSubject, contactText } = req.body; 
+    console.log("RETRIEVED DATA: ", contactName, contactEmail, contactSubject, contactText);
+
     try {
-        const mailOptions = await transporter.sendMail({
+        // Prepare the email options
+        const mailOptions = {
             from: {
-                name: "MoodCheck User",
+                name: contactName ? `${contactName} - MoodCheck User` : `MoodCheck User`,
                 address: process.env.USER
             },
-            to: ["kirisame404@gmail.com"],
-            subject: "Sending MoodCheck Feedback ✔",
-            text: "Hello world?",
-            html: "<b>Hello world?</b>",
-        });
+            to: ["moodcheck12@gmail.com"],
+            subject: contactSubject,
+            text: `${contactText}\n\nFrom: ${contactEmail}`,
+        };
 
-        async function sendMail(transporter, mailOptions) {
-            try {
-                await transporter.sendMail(mailOptions)
-                console.log("Email has been sent succesfully!")
-            } catch(err) {
-                console.error('sendMail Error: ',err)
-            }
-        }
-        sendMail(transporter, mailOptions);
-    } catch(err) {
-        console.log("ERR: ",err)
-    }
-})
-
-
-app.post("/sendemail", async (req, res) => {
-        const { contactName, contactEmail, contactSubject, contactText } = req.body; 
-    try {
+        // sendMail(transporter, mailOptions)
+        await transporter.sendMail(mailOptions); // Send email directly without the need for sendMail function
+        console.log("Email has been sent successfully!");
         res.json({ message: "Email has been sent successfully!" });
-    } catch(err) {
-        console.log(err.message)
+    } catch (err) {
+        console.log("ERR: ", err);
+        res.status(500).json({ error: "Failed to send email." }); // Send a response with error status
     } 
 });
 
